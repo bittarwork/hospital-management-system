@@ -5,11 +5,14 @@ const dotenv = require('dotenv');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
 
 // Load environment variables
 dotenv.config();
 
 // Import routes
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/users');
 const patientRoutes = require('./routes/patients');
 const doctorRoutes = require('./routes/doctors');
 const appointmentRoutes = require('./routes/appointments');
@@ -21,16 +24,24 @@ const app = express();
 // Security middleware
 app.use(helmet());
 
-// Rate limiting
+// Rate limiting - More permissive in development
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    max: process.env.NODE_ENV === 'development' ? 1000 : 100, // Higher limit in development
     message: {
         error: 'Too many requests from this IP, please try again later.',
         statusCode: 429
+    },
+    skip: (req, res) => {
+        // Skip rate limiting for health checks and development
+        return req.path === '/health' || process.env.NODE_ENV === 'development';
     }
 });
-app.use('/api/', limiter);
+
+// Only apply rate limiting in production
+if (process.env.NODE_ENV === 'production') {
+    app.use('/api/', limiter);
+}
 
 // CORS configuration
 const corsOptions = {
@@ -43,6 +54,9 @@ app.use(cors(corsOptions));
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Cookie parsing middleware
+app.use(cookieParser());
 
 // Logging middleware
 if (process.env.NODE_ENV === 'development') {
@@ -87,6 +101,11 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
+// Authentication routes (public)
+app.use('/api/auth', authRoutes);
+
+// Protected routes
+app.use('/api/users', userRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/appointments', appointmentRoutes);
@@ -101,6 +120,8 @@ app.get('/', (req, res) => {
         version: '2.0.0',
         documentation: '/api/docs',
         endpoints: {
+            auth: '/api/auth',
+            users: '/api/users',
             patients: '/api/patients',
             doctors: '/api/doctors',
             appointments: '/api/appointments',
@@ -109,6 +130,9 @@ app.get('/', (req, res) => {
             health: '/health'
         },
         features: [
+            'User Authentication & Authorization',
+            'Role-based Access Control',
+            'User Management',
             'Patient Management',
             'Doctor Management',
             'Appointment Scheduling',

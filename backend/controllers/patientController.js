@@ -141,6 +141,8 @@ const searchPatients = async (req, res) => {
                 { firstName: { $regex: query, $options: 'i' } },
                 { lastName: { $regex: query, $options: 'i' } },
                 { email: { $regex: query, $options: 'i' } },
+                { nationalId: { $regex: query, $options: 'i' } },
+                { phone: { $regex: query, $options: 'i' } },
                 { patientId: { $regex: query, $options: 'i' } }
             ];
         }

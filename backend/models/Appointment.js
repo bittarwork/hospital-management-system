@@ -486,7 +486,7 @@ AppointmentSchema.index({ patient: 1, appointmentDate: 1 });
 AppointmentSchema.index({ doctor: 1, appointmentDate: 1 });
 AppointmentSchema.index({ appointmentDate: 1, appointmentTime: 1 });
 AppointmentSchema.index({ status: 1 });
-AppointmentSchema.index({ appointmentId: 1 });
+// Note: appointmentId index is automatically created due to unique: true
 AppointmentSchema.index({ appointmentType: 1 });
 AppointmentSchema.index({ priority: 1 });
 

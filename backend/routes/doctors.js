@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { authenticate } = require('../middleware/auth');
+
+// Apply authentication to all routes
+router.use(authenticate);
 
 // Import all controller functions
 const {

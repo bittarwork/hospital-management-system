@@ -3,6 +3,17 @@ const bcrypt = require('bcryptjs');
 
 const PatientSchema = new mongoose.Schema({
     // Personal Information
+    nationalId: {
+        type: String,
+        unique: true,
+        sparse: true,
+        validate: {
+            validator: function (v) {
+                return !v || /^\d{10}$/.test(v);
+            },
+            message: 'رقم الهوية يجب أن يكون 10 أرقام'
+        }
+    },
     firstName: {
         type: String,
         required: [true, 'First name is required'],
@@ -66,15 +77,17 @@ const PatientSchema = new mongoose.Schema({
         }
     },
     address: {
+        type: mongoose.Schema.Types.Mixed, // Support both string and object
+        default: ""
+    },
+    addressDetails: {
         street: {
             type: String,
-            required: [true, 'Street address is required'],
             trim: true,
             maxlength: [100, 'Street address cannot be more than 100 characters']
         },
         city: {
             type: String,
-            required: [true, 'City is required'],
             trim: true,
             maxlength: [50, 'City cannot be more than 50 characters']
         },
@@ -95,7 +108,6 @@ const PatientSchema = new mongoose.Schema({
         },
         country: {
             type: String,
-            required: [true, 'Country is required'],
             trim: true,
             default: 'Saudi Arabia'
         }
@@ -339,7 +351,7 @@ const PatientSchema = new mongoose.Schema({
 
 // Indexes for better performance
 PatientSchema.index({ firstName: 1, lastName: 1 });
-PatientSchema.index({ patientId: 1 });
+// Note: patientId index is automatically created due to unique: true
 PatientSchema.index({ status: 1 });
 PatientSchema.index({ registrationDate: -1 });
 PatientSchema.index({ 'emergencyContact.phone': 1 });

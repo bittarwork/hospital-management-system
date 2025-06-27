@@ -1,58 +1,69 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import App from "./App.jsx";
 import "./index.css";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
-    <Toaster
-      position="top-center"
-      reverseOrder={false}
-      gutter={8}
-      containerClassName=""
-      containerStyle={{}}
-      toastOptions={{
-        // Define default options
-        className: "",
-        duration: 4000,
-        style: {
-          background: "#363636",
-          color: "#fff",
-          fontFamily: "Cairo, sans-serif",
-          fontSize: "14px",
-          borderRadius: "12px",
-          padding: "12px 16px",
-          direction: "rtl",
-        },
-        // Default options for specific types
-        success: {
-          duration: 3000,
-          style: {
-            background: "#4caf50",
-          },
-          iconTheme: {
-            primary: "#fff",
-            secondary: "#4caf50",
-          },
-        },
-        error: {
+createRoot(document.getElementById("root")).render(
+  <StrictMode>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
+      <App />
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        gutter={8}
+        containerClassName=""
+        containerStyle={{}}
+        toastOptions={{
+          // Default options for all toasts
+          className: "",
           duration: 4000,
           style: {
-            background: "#f44336",
+            background: "#363636",
+            color: "#fff",
+            fontFamily: "Cairo, Inter, sans-serif",
+            fontSize: "14px",
+            borderRadius: "8px",
+            padding: "12px",
           },
-          iconTheme: {
-            primary: "#fff",
-            secondary: "#f44336",
+          // Success toasts
+          success: {
+            style: {
+              background: "#10b981",
+            },
+            iconTheme: {
+              primary: "#fff",
+              secondary: "#10b981",
+            },
           },
-        },
-        loading: {
-          style: {
-            background: "#2196f3",
+          // Error toasts
+          error: {
+            style: {
+              background: "#ef4444",
+            },
+            iconTheme: {
+              primary: "#fff",
+              secondary: "#ef4444",
+            },
           },
-        },
-      }}
-    />
-  </React.StrictMode>
+          // Loading toasts
+          loading: {
+            style: {
+              background: "#3b82f6",
+            },
+            iconTheme: {
+              primary: "#fff",
+              secondary: "#3b82f6",
+            },
+          },
+        }}
+      />
+    </BrowserRouter>
+  </StrictMode>
 );

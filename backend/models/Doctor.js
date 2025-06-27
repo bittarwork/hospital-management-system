@@ -45,6 +45,21 @@ const DoctorSchema = new mongoose.Schema({
         required: [true, 'Specialization is required'],
         enum: {
             values: [
+                'طب عام',
+                'طب باطني',
+                'جراحة عامة',
+                'طب أطفال',
+                'نساء وولادة',
+                'طب عيون',
+                'طب أسنان',
+                'طب نفسي',
+                'طب جلدية',
+                'طب عظام',
+                'طب قلب',
+                'طب أعصاب',
+                'طب أنف وأذن',
+                'طب مسالك بولية',
+                'طب تخدير',
                 'General Medicine',
                 'Internal Medicine',
                 'General Surgery',
@@ -119,10 +134,9 @@ const DoctorSchema = new mongoose.Schema({
     },
     licenseExpiryDate: {
         type: Date,
-        required: [true, 'License expiry date is required'],
         validate: {
             validator: function (v) {
-                return v > new Date();
+                return !v || v > new Date();
             },
             message: 'License expiry date must be in the future'
         }
@@ -137,9 +151,13 @@ const DoctorSchema = new mongoose.Schema({
     // Professional Experience
     yearsOfExperience: {
         type: Number,
-        required: [true, 'Years of experience is required'],
         min: [0, 'Years of experience cannot be negative'],
         max: [70, 'Years of experience cannot be more than 70']
+    },
+    experience: {
+        type: Number,
+        min: [0, 'Experience cannot be negative'],
+        max: [70, 'Experience cannot be more than 70']
     },
 
     // Education and Qualifications
@@ -267,7 +285,6 @@ const DoctorSchema = new mongoose.Schema({
     // Financial Information
     consultationFee: {
         type: Number,
-        required: [true, 'Consultation fee is required'],
         min: [0, 'Consultation fee cannot be negative']
     },
     followUpFee: {
@@ -282,7 +299,6 @@ const DoctorSchema = new mongoose.Schema({
     // Department and Role
     department: {
         type: String,
-        required: [true, 'Department is required'],
         trim: true,
         maxlength: [100, 'Department name cannot be more than 100 characters']
     },
@@ -317,7 +333,6 @@ const DoctorSchema = new mongoose.Schema({
     },
     joiningDate: {
         type: Date,
-        required: [true, 'Joining date is required'],
         default: Date.now
     },
     contractEndDate: {
@@ -469,7 +484,7 @@ DoctorSchema.index({ firstName: 1, lastName: 1 });
 DoctorSchema.index({ specialization: 1 });
 DoctorSchema.index({ department: 1 });
 DoctorSchema.index({ status: 1 });
-DoctorSchema.index({ doctorId: 1 });
+// Note: doctorId index is automatically created due to unique: true
 DoctorSchema.index({ 'schedule.dayOfWeek': 1 });
 
 // Virtual for full name

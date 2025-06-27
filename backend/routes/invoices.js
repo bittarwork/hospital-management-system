@@ -77,6 +77,6 @@ router.get('/:id/pdf', generateInvoicePDF);                    // Generate invoi
 
 // Bulk Operations
 router.post('/bulk/payments', bulkProcessPayments);            // Process bulk payments
-router.post('/export', exportInvoices);                        // Export invoices to file
+router.get('/export', exportInvoices);                         // Export invoices to file
 
 module.exports = router; 
