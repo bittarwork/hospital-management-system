@@ -45,7 +45,23 @@ const generateRandomEmail = (firstName, lastName) => {
     const domains = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com'];
     const domain = domains[Math.floor(Math.random() * domains.length)];
     const randomNum = Math.floor(Math.random() * 999) + 1;
-    return `${firstName.replace(/\s/g, '').toLowerCase()}${lastName.replace(/\s/g, '').toLowerCase()}${randomNum}@${domain}`;
+
+    // تحويل الأسماء العربية إلى أحرف إنجليزية
+    const arabicToEnglish = {
+        'أ': 'a', 'ا': 'a', 'آ': 'a', 'إ': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h', 'خ': 'kh',
+        'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't', 'ظ': 'th',
+        'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q', 'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w',
+        'ي': 'y', 'ى': 'y', 'ة': 'h', 'ء': 'a'
+    };
+
+    const convertArabicToEnglish = (text) => {
+        return text.split('').map(char => arabicToEnglish[char] || char).join('');
+    };
+
+    const firstNameEn = convertArabicToEnglish(firstName.replace(/\s/g, '').toLowerCase());
+    const lastNameEn = convertArabicToEnglish(lastName.replace(/\s/g, '').toLowerCase());
+
+    return `${firstNameEn}${lastNameEn}${randomNum}@${domain}`;
 };
 
 const generateRandomDate = (startDate, endDate) => {
@@ -153,7 +169,21 @@ async function createUsers() {
         const arabicDept = DEPARTMENTS[Math.floor(Math.random() * DEPARTMENTS.length)];
         const englishDept = departmentMap[arabicDept] || 'Internal Medicine';
 
-        const username = `${firstName.replace(/\s/g, '').toLowerCase()}${lastName.replace(/\s/g, '').toLowerCase()}${Math.floor(Math.random() * 999) + 1}`;
+        // تحويل الأسماء العربية إلى أحرف إنجليزية للـ username
+        const arabicToEnglish = {
+            'أ': 'a', 'ا': 'a', 'آ': 'a', 'إ': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h', 'خ': 'kh',
+            'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't', 'ظ': 'th',
+            'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q', 'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w',
+            'ي': 'y', 'ى': 'y', 'ة': 'h', 'ء': 'a'
+        };
+
+        const convertArabicToEnglish = (text) => {
+            return text.split('').map(char => arabicToEnglish[char] || char).join('');
+        };
+
+        const firstNameEn = convertArabicToEnglish(firstName.replace(/\s/g, '').toLowerCase());
+        const lastNameEn = convertArabicToEnglish(lastName.replace(/\s/g, '').toLowerCase());
+        const username = `${firstNameEn}${lastNameEn}${Math.floor(Math.random() * 999) + 1}`;
 
         const user = new User({
             firstName,
