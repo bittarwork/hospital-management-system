@@ -85,23 +85,27 @@ async function createSuperAdmin() {
     const hashedPassword = await bcrypt.hash(adminPassword, 12);
 
     const adminUser = new User({
-        name: process.env.ADMIN_NAME || 'مدير النظام',
+        firstName: 'مدير',
+        lastName: 'النظام',
+        username: 'admin_system',
         email: adminEmail,
         password: hashedPassword,
         phone: process.env.ADMIN_PHONE || '+966501234567',
         role: 'super_admin',
-        department: 'الإدارة العامة',
-        isActive: true,
-        permissions: {
-            users: { create: true, read: true, update: true, delete: true },
-            patients: { create: true, read: true, update: true, delete: true },
-            doctors: { create: true, read: true, update: true, delete: true },
-            appointments: { create: true, read: true, update: true, delete: true },
-            medicalRecords: { create: true, read: true, update: true, delete: true },
-            invoices: { create: true, read: true, update: true, delete: true },
-            reports: { create: true, read: true, update: true, delete: true },
-            settings: { create: true, read: true, update: true, delete: true }
-        }
+        department: 'Administration',
+        status: 'active',
+        isVerified: true,
+        mustChangePassword: false,
+        permissions: [
+            { module: 'users', actions: ['manage'] },
+            { module: 'patients', actions: ['manage'] },
+            { module: 'doctors', actions: ['manage'] },
+            { module: 'appointments', actions: ['manage'] },
+            { module: 'medical_records', actions: ['manage'] },
+            { module: 'invoices', actions: ['manage'] },
+            { module: 'reports', actions: ['manage'] },
+            { module: 'settings', actions: ['manage'] }
+        ]
     });
 
     await adminUser.save();
@@ -125,24 +129,45 @@ async function createUsers() {
         const fullName = `${firstName} ${lastName}`;
         const role = roles[Math.floor(Math.random() * roles.length)];
 
+        const departmentMap = {
+            'الطوارئ': 'Emergency',
+            'القلب': 'Cardiology',
+            'الأطفال': 'Pediatrics',
+            'النساء والولادة': 'Obstetrics and Gynecology',
+            'الجراحة': 'Surgery',
+            'العيون': 'Ophthalmology',
+            'الأسنان': 'ENT',
+            'الجلدية': 'Dermatology',
+            'الأعصاب': 'Neurology',
+            'العظام': 'Orthopedics',
+            'الطب النفسي': 'Psychiatry',
+            'الأنف والأذن والحنجرة': 'ENT',
+            'الكلى': 'Internal Medicine',
+            'الجهاز الهضمي': 'Internal Medicine',
+            'التخدير': 'Anesthesiology',
+            'الأشعة': 'Radiology',
+            'المختبر': 'Laboratory',
+            'العلاج الطبيعي': 'Internal Medicine'
+        };
+
+        const arabicDept = DEPARTMENTS[Math.floor(Math.random() * DEPARTMENTS.length)];
+        const englishDept = departmentMap[arabicDept] || 'Internal Medicine';
+
+        const username = `${firstName.replace(/\s/g, '').toLowerCase()}${lastName.replace(/\s/g, '').toLowerCase()}${Math.floor(Math.random() * 999) + 1}`;
+
         const user = new User({
-            name: fullName,
+            firstName,
+            lastName,
+            username,
             email: generateRandomEmail(firstName, lastName),
             password: await bcrypt.hash('password123', 12),
             phone: generateRandomPhone(),
             role: role,
-            department: DEPARTMENTS[Math.floor(Math.random() * DEPARTMENTS.length)],
-            isActive: Math.random() > 0.1,
-            permissions: {
-                users: { create: role === 'admin', read: true, update: role === 'admin', delete: false },
-                patients: { create: true, read: true, update: true, delete: role === 'admin' },
-                doctors: { create: role === 'admin', read: true, update: role === 'admin', delete: false },
-                appointments: { create: true, read: true, update: true, delete: role === 'admin' },
-                medicalRecords: { create: ['doctor', 'nurse'].includes(role), read: true, update: ['doctor', 'nurse'].includes(role), delete: false },
-                invoices: { create: ['admin', 'receptionist'].includes(role), read: true, update: ['admin', 'receptionist'].includes(role), delete: role === 'admin' },
-                reports: { create: role === 'admin', read: true, update: false, delete: false },
-                settings: { create: false, read: role === 'admin', update: false, delete: false }
-            }
+            department: englishDept,
+            status: Math.random() > 0.1 ? 'active' : 'inactive',
+            isVerified: true,
+            mustChangePassword: Math.random() > 0.5,
+            permissions: User.getDefaultPermissions(role)
         });
 
         users.push(user);
