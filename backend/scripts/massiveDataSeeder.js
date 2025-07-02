@@ -27,7 +27,13 @@ const ARABIC_FIRST_NAMES = {
 
 const ARABIC_LAST_NAMES = ['العتيبي', 'المطيري', 'الدوسري', 'الشهري', 'الحربي', 'القحطاني', 'العنزي', 'الرشيد', 'الخالدي', 'السديري', 'البقمي', 'الفقيه', 'الزهراني', 'الغامدي', 'العمري', 'الشمري', 'الثقفي', 'الجعفري', 'الهاشمي', 'السلمي', 'التميمي', 'الخزرجي', 'الأموي', 'العباسي', 'الفارسي', 'الكردي', 'التركي', 'المصري', 'الشامي', 'اليمني'];
 
-const SPECIALIZATIONS = ['طب القلب', 'طب الأطفال', 'طب النساء والولادة', 'الجراحة العامة', 'طب العيون', 'طب الأسنان', 'طب الجلدية', 'طب الأعصاب', 'طب العظام', 'الطب النفسي', 'طب الأنف والأذن والحنجرة', 'طب الكلى', 'طب الجهاز الهضمي', 'طب الطوارئ', 'طب التخدير', 'الأشعة التشخيصية', 'المختبرات الطبية', 'العلاج الطبيعي'];
+const SPECIALIZATIONS = [
+    'General Medicine', 'Internal Medicine', 'General Surgery', 'Pediatrics',
+    'Obstetrics and Gynecology', 'Cardiology', 'Orthopedics', 'Dermatology',
+    'Ophthalmology', 'ENT (Ear, Nose, Throat)', 'Neurology', 'Psychiatry',
+    'Dentistry', 'Anesthesiology', 'Radiology', 'Emergency Medicine',
+    'Family Medicine', 'Urology', 'Gastroenterology'
+];
 
 const DEPARTMENTS = ['الطوارئ', 'القلب', 'الأطفال', 'النساء والولادة', 'الجراحة', 'العيون', 'الأسنان', 'الجلدية', 'الأعصاب', 'العظام', 'الطب النفسي', 'الأنف والأذن والحنجرة', 'الكلى', 'الجهاز الهضمي', 'التخدير', 'الأشعة', 'المختبر', 'العلاج الطبيعي'];
 
@@ -51,11 +57,12 @@ const generateRandomEmail = (firstName, lastName) => {
         'أ': 'a', 'ا': 'a', 'آ': 'a', 'إ': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h', 'خ': 'kh',
         'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't', 'ظ': 'th',
         'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q', 'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w',
-        'ي': 'y', 'ى': 'y', 'ة': 'h', 'ء': 'a'
+        'ي': 'y', 'ى': 'y', 'ة': 'h', 'ء': 'a', 'ئ': 'a', 'ؤ': 'o'
     };
 
     const convertArabicToEnglish = (text) => {
-        return text.split('').map(char => arabicToEnglish[char] || char).join('');
+        return text.split('').map(char => arabicToEnglish[char] || char).join('')
+            .replace(/[^a-zA-Z0-9]/g, ''); // إزالة أي أحرف غير مقبولة
     };
 
     const firstNameEn = convertArabicToEnglish(firstName.replace(/\s/g, '').toLowerCase());
@@ -98,14 +105,12 @@ async function createSuperAdmin() {
         return existingAdmin;
     }
 
-    const hashedPassword = await bcrypt.hash(adminPassword, 12);
-
     const adminUser = new User({
         firstName: 'مدير',
         lastName: 'النظام',
         username: 'admin_system',
         email: adminEmail,
-        password: hashedPassword,
+        password: adminPassword, // سيتم تشفيرها تلقائياً بواسطة pre-save middleware
         phone: process.env.ADMIN_PHONE || '+966501234567',
         role: 'super_admin',
         department: 'Administration',
@@ -174,11 +179,12 @@ async function createUsers() {
             'أ': 'a', 'ا': 'a', 'آ': 'a', 'إ': 'a', 'ب': 'b', 'ت': 't', 'ث': 'th', 'ج': 'j', 'ح': 'h', 'خ': 'kh',
             'د': 'd', 'ذ': 'dh', 'ر': 'r', 'ز': 'z', 'س': 's', 'ش': 'sh', 'ص': 's', 'ض': 'd', 'ط': 't', 'ظ': 'th',
             'ع': 'a', 'غ': 'gh', 'ف': 'f', 'ق': 'q', 'ك': 'k', 'ل': 'l', 'م': 'm', 'ن': 'n', 'ه': 'h', 'و': 'w',
-            'ي': 'y', 'ى': 'y', 'ة': 'h', 'ء': 'a'
+            'ي': 'y', 'ى': 'y', 'ة': 'h', 'ء': 'a', 'ئ': 'a', 'ؤ': 'o'
         };
 
         const convertArabicToEnglish = (text) => {
-            return text.split('').map(char => arabicToEnglish[char] || char).join('');
+            return text.split('').map(char => arabicToEnglish[char] || char).join('')
+                .replace(/[^a-zA-Z0-9]/g, ''); // إزالة أي أحرف غير مقبولة
         };
 
         const firstNameEn = convertArabicToEnglish(firstName.replace(/\s/g, '').toLowerCase());
@@ -190,7 +196,7 @@ async function createUsers() {
             lastName,
             username,
             email: generateRandomEmail(firstName, lastName),
-            password: await bcrypt.hash('password123', 12),
+            password: 'password123', // سيتم تشفيرها تلقائياً
             phone: generateRandomPhone(),
             role: role,
             department: englishDept,
@@ -226,35 +232,93 @@ async function createDoctors() {
             lastName,
             email: generateRandomEmail(firstName, lastName),
             phone: generateRandomPhone(),
+            gender: gender,
             specialization,
             department: DEPARTMENTS[Math.floor(Math.random() * DEPARTMENTS.length)],
             licenseNumber: `DR${Date.now()}${i}`,
             yearsOfExperience: Math.floor(Math.random() * 25) + 2,
             education: [
                 {
-                    degree: 'بكالوريوس الطب والجراحة',
-                    institution: 'جامعة الملك سعود',
-                    year: 2010 + Math.floor(Math.random() * 10)
+                    degree: 'MBBS',
+                    institution: 'King Saud University',
+                    fieldOfStudy: 'Medicine and Surgery',
+                    graduationYear: 2010 + Math.floor(Math.random() * 10)
                 },
                 {
-                    degree: `دبلوم عالي في ${specialization}`,
-                    institution: 'مدينة الملك فهد الطبية',
-                    year: 2015 + Math.floor(Math.random() * 8)
+                    degree: 'Fellowship',
+                    institution: 'King Fahd Medical City',
+                    fieldOfStudy: specialization,
+                    graduationYear: 2015 + Math.floor(Math.random() * 8)
                 }
             ],
-            workingHours: {
-                saturday: { start: '08:00', end: '16:00', isWorking: true },
-                sunday: { start: '08:00', end: '16:00', isWorking: true },
-                monday: { start: '08:00', end: '16:00', isWorking: true },
-                tuesday: { start: '08:00', end: '16:00', isWorking: true },
-                wednesday: { start: '08:00', end: '16:00', isWorking: true },
-                thursday: { start: '08:00', end: '14:00', isWorking: true },
-                friday: { start: '00:00', end: '00:00', isWorking: false }
-            },
+            schedule: [
+                {
+                    dayOfWeek: 'saturday',
+                    startTime: '08:00',
+                    endTime: '16:00',
+                    breakStartTime: '12:00',
+                    breakEndTime: '13:00',
+                    isAvailable: true,
+                    maxPatients: Math.floor(Math.random() * 20) + 10
+                },
+                {
+                    dayOfWeek: 'sunday',
+                    startTime: '08:00',
+                    endTime: '16:00',
+                    breakStartTime: '12:00',
+                    breakEndTime: '13:00',
+                    isAvailable: true,
+                    maxPatients: Math.floor(Math.random() * 20) + 10
+                },
+                {
+                    dayOfWeek: 'monday',
+                    startTime: '08:00',
+                    endTime: '16:00',
+                    breakStartTime: '12:00',
+                    breakEndTime: '13:00',
+                    isAvailable: true,
+                    maxPatients: Math.floor(Math.random() * 20) + 10
+                },
+                {
+                    dayOfWeek: 'tuesday',
+                    startTime: '08:00',
+                    endTime: '16:00',
+                    breakStartTime: '12:00',
+                    breakEndTime: '13:00',
+                    isAvailable: true,
+                    maxPatients: Math.floor(Math.random() * 20) + 10
+                },
+                {
+                    dayOfWeek: 'wednesday',
+                    startTime: '08:00',
+                    endTime: '16:00',
+                    breakStartTime: '12:00',
+                    breakEndTime: '13:00',
+                    isAvailable: true,
+                    maxPatients: Math.floor(Math.random() * 20) + 10
+                },
+                {
+                    dayOfWeek: 'thursday',
+                    startTime: '08:00',
+                    endTime: '14:00',
+                    breakStartTime: '12:00',
+                    breakEndTime: '13:00',
+                    isAvailable: true,
+                    maxPatients: Math.floor(Math.random() * 15) + 8
+                }
+            ],
             consultationFee: Math.floor(Math.random() * 300) + 100,
-            isActive: Math.random() > 0.05,
-            rating: Math.random() * 2 + 3,
-            totalReviews: Math.floor(Math.random() * 100) + 5
+            followUpFee: Math.floor(Math.random() * 150) + 50,
+            emergencyFee: Math.floor(Math.random() * 500) + 200,
+            status: Math.random() > 0.05 ? 'active' : 'inactive',
+            ratings: {
+                averageRating: Math.random() * 2 + 3,
+                totalReviews: Math.floor(Math.random() * 100) + 5
+            },
+            languagesSpoken: [
+                { language: 'Arabic', proficiency: 'native' },
+                { language: 'English', proficiency: Math.random() > 0.5 ? 'fluent' : 'intermediate' }
+            ]
         });
 
         doctors.push(doctor);
@@ -285,31 +349,49 @@ async function createPatients() {
             nationalId: generateRandomNationalId(),
             dateOfBirth: generateRandomDate('1950-01-01', '2020-12-31'),
             gender,
-            address: {
+            addressDetails: {
                 street: `شارع ${Math.floor(Math.random() * 50) + 1}`,
                 city: CITIES[Math.floor(Math.random() * CITIES.length)],
-                zipCode: Math.floor(Math.random() * 90000) + 10000,
-                country: 'السعودية'
+                zipCode: (Math.floor(Math.random() * 90000) + 10000).toString(),
+                country: 'Saudi Arabia'
             },
             emergencyContact: {
                 name: `${ARABIC_FIRST_NAMES[gender === 'male' ? 'female' : 'male'][Math.floor(Math.random() * 10)]} ${lastName}`,
-                relationship: Math.random() > 0.5 ? 'زوج/زوجة' : 'والد/والدة',
+                relationship: Math.random() > 0.5 ? 'spouse' : 'parent',
                 phone: generateRandomPhone()
             },
-            medicalInfo: {
-                bloodType: generateRandomBloodType(),
-                allergies: Math.random() > 0.7 ? ['البنسلين', 'المأكولات البحرية'].slice(0, Math.floor(Math.random() * 2) + 1) : [],
-                chronicDiseases: Math.random() > 0.8 ? ['السكري', 'ضغط الدم', 'الربو'].slice(0, Math.floor(Math.random() * 2) + 1) : [],
-                surgicalHistory: Math.random() > 0.9 ? ['عملية الزائدة الدودية'] : [],
-                medications: Math.random() > 0.7 ? ['الميتفورمين', 'الأسبرين'].slice(0, Math.floor(Math.random() * 2) + 1) : []
-            },
+            bloodType: generateRandomBloodType(),
+            allergies: Math.random() > 0.7 ? [
+                { allergen: 'Penicillin', severity: 'moderate', reaction: 'Rash' },
+                { allergen: 'Seafood', severity: 'mild', reaction: 'Nausea' }
+            ].slice(0, Math.floor(Math.random() * 2) + 1) : [],
+            medicalHistory: Math.random() > 0.8 ? [
+                { condition: 'Diabetes', diagnosedDate: generateRandomDate('2010-01-01', '2023-12-31'), status: 'chronic' },
+                { condition: 'Hypertension', diagnosedDate: generateRandomDate('2015-01-01', '2023-12-31'), status: 'active' }
+            ].slice(0, Math.floor(Math.random() * 2) + 1) : [],
+            currentMedications: Math.random() > 0.7 ? [
+                {
+                    medicationName: 'Metformin',
+                    dosage: '500mg',
+                    frequency: 'Twice daily',
+                    startDate: generateRandomDate('2022-01-01', '2023-12-31')
+                },
+                {
+                    medicationName: 'Aspirin',
+                    dosage: '75mg',
+                    frequency: 'Once daily',
+                    startDate: generateRandomDate('2022-01-01', '2023-12-31')
+                }
+            ].slice(0, Math.floor(Math.random() * 2) + 1) : [],
             insurance: {
-                company: generateRandomInsurance(),
+                provider: generateRandomInsurance(),
                 policyNumber: `POL${Math.floor(Math.random() * 999999) + 100000}`,
-                expiryDate: generateRandomDate('2024-06-01', '2026-12-31'),
-                coveragePercentage: [70, 80, 90, 100][Math.floor(Math.random() * 4)]
+                expirationDate: generateRandomDate('2024-06-01', '2026-12-31'),
+                copayAmount: [50, 100, 150, 200][Math.floor(Math.random() * 4)]
             },
-            isActive: Math.random() > 0.02
+            status: Math.random() > 0.02 ? 'active' : 'inactive',
+            consentToTreatment: true,
+            consentToDataSharing: Math.random() > 0.3
         });
 
         patients.push(patient);
@@ -326,13 +408,16 @@ async function createAppointments(doctors, patients) {
     console.log('📅 إنشاء المواعيد...');
 
     const appointments = [];
-    const statuses = ['scheduled', 'confirmed', 'checked-in', 'in-progress', 'completed', 'cancelled', 'no-show'];
-    const types = ['consultation', 'follow-up', 'emergency', 'routine-checkup', 'specialist-visit'];
+    const statuses = ['scheduled', 'confirmed', 'checked-in', 'in-progress', 'completed', 'cancelled', 'no-show', 'rescheduled'];
+    const types = ['consultation', 'follow-up', 'routine-checkup', 'emergency', 'procedure', 'diagnostic'];
 
     for (let i = 0; i < CONFIG.TOTAL_APPOINTMENTS; i++) {
         const doctor = doctors[Math.floor(Math.random() * doctors.length)];
         const patient = patients[Math.floor(Math.random() * patients.length)];
-        const appointmentDate = generateRandomDate('2024-01-01', '2024-12-31');
+        // إنشاء تاريخ آمن في المستقبل
+        const today = new Date();
+        const futureDate = new Date(today.getTime() + (Math.random() * 365 * 24 * 60 * 60 * 1000)); // في السنة القادمة
+        const appointmentDate = futureDate;
         const status = statuses[Math.floor(Math.random() * statuses.length)];
 
         const appointment = new Appointment({
@@ -342,30 +427,19 @@ async function createAppointments(doctors, patients) {
             appointmentTime: `${Math.floor(Math.random() * 12) + 8}:${['00', '30'][Math.floor(Math.random() * 2)]}`,
             appointmentType: types[Math.floor(Math.random() * types.length)],
             status,
-            reason: `${Math.random() > 0.5 ? 'فحص دوري' : 'استشارة طبية'} في تخصص ${doctor.specialization}`,
-            notes: Math.random() > 0.5 ? 'ملاحظات إضافية للموعد' : '',
-            duration: [15, 30, 45, 60][Math.floor(Math.random() * 4)],
-            fee: doctor.consultationFee,
-            isPaid: Math.random() > 0.3,
-            priority: ['low', 'medium', 'high', 'urgent'][Math.floor(Math.random() * 4)],
-            statusHistory: [
-                {
-                    status: 'scheduled',
-                    timestamp: new Date(appointmentDate.getTime() - 86400000),
-                    updatedBy: 'النظام',
-                    notes: 'تم إنشاء الموعد'
-                }
-            ]
+            reasonForVisit: `${Math.random() > 0.5 ? 'فحص دوري' : 'استشارة طبية'} في تخصص ${doctor.specialization}`,
+            estimatedDuration: [15, 30, 45, 60][Math.floor(Math.random() * 4)],
+            consultationFee: doctor.consultationFee,
+            priority: ['low', 'normal', 'high', 'urgent'][Math.floor(Math.random() * 4)],
+            createdBy: 'النظام',
+            privateNotes: Math.random() > 0.5 ? 'ملاحظات إضافية للموعد' : '',
+            totalAmount: doctor.consultationFee,
+            insurance: {
+                isInsured: Math.random() > 0.5,
+                provider: Math.random() > 0.5 ? generateRandomInsurance() : undefined,
+                coveragePercentage: Math.random() > 0.5 ? [70, 80, 90, 100][Math.floor(Math.random() * 4)] : undefined
+            }
         });
-
-        if (status !== 'scheduled') {
-            appointment.statusHistory.push({
-                status,
-                timestamp: appointmentDate,
-                updatedBy: 'الطبيب',
-                notes: `تم تحديث حالة الموعد إلى ${status}`
-            });
-        }
 
         appointments.push(appointment);
     }

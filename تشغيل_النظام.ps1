@@ -45,14 +45,14 @@ Write-Host "🚀 تشغيل الخوادم..." -ForegroundColor Cyan
 
 # تشغيل Backend
 Write-Host "📡 تشغيل خادم Backend..." -ForegroundColor Blue
-Start-Process -FilePath "cmd" -ArgumentList "/c", "cd backend && npm run dev" -WindowStyle Normal
+Start-Process -FilePath "powershell" -ArgumentList "-Command", "cd backend; npm run dev" -WindowStyle Normal
 
 # انتظار قصير
 Start-Sleep -Seconds 3
 
 # تشغيل Frontend
 Write-Host "🎨 تشغيل خادم Frontend..." -ForegroundColor Blue
-Start-Process -FilePath "cmd" -ArgumentList "/c", "cd frontend && npm run dev" -WindowStyle Normal
+Start-Process -FilePath "powershell" -ArgumentList "-Command", "cd frontend; npm run dev" -WindowStyle Normal
 
 Write-Host ""
 Write-Host "✅ تم تشغيل النظام بنجاح!" -ForegroundColor Green
